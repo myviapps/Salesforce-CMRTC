@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Student Training Portfolio Portal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f0f4ff;min-height:100vh;color:#111827}
+
+/* NAV */
+nav{background:#0f1443;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.95rem;color:#fff;letter-spacing:-.2px}
+.nav-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center}
+.nav-icon svg{width:17px;height:17px;fill:#fff}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:transparent;border:none;color:rgba(255,255,255,.55);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.nav-tab:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-tab.on{background:rgba(255,255,255,.12);color:#fff}
+.live-dot{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:#4ade80}
+.ld{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* STATS BAR */
+.sbar{background:linear-gradient(90deg,#0a0e33,#0f1443);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.sbar-l{display:flex;align-items:center;gap:10px}
+.cpill{background:rgba(59,130,246,.25);border:1px solid rgba(59,130,246,.4);color:#93c5fd;font-size:.6rem;font-weight:700;letter-spacing:.8px;padding:3px 9px;border-radius:4px;text-transform:uppercase}
+.sbar-txt{font-size:.75rem;color:#64748b}
+.sbar-r{display:flex;gap:20px;flex-wrap:wrap}
+.si{font-size:.76rem;color:#94a3b8;display:flex;align-items:center;gap:4px}
+.si b{color:#e2e8f0;font-weight:700}
+
+/* VIEWS */
+.view{display:none}.view.on{display:block}
+
+/* ═══ DASHBOARD ═══ */
+.dmain{max-width:1080px;margin:0 auto;padding:28px 16px 64px}
+.dhdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:12px}
+.dhdr-l h2{font-size:1.35rem;font-weight:900;color:#0f1443;letter-spacing:-.4px}
+.dhdr-l p{font-size:.8rem;color:#64748b;margin-top:3px}
+.sync-tag{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:7px 14px;font-size:.74rem;font-weight:600;color:#64748b;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.slbl{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.slbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#e2e8f0,transparent)}
+
+/* KPI GRID */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:860px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.kgrid{grid-template-columns:1fr}}
+.kpi{background:#fff;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:1.5px solid transparent}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.1);border-color:var(--kc)}
+.kpi:active{transform:scale(.97)}
+.kpi-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.07;background:var(--kc)}
+.kpi-icon{font-size:1.4rem;margin-bottom:10px}
+.kpi-n{font-size:1.65rem;font-weight:900;letter-spacing:-.5px;line-height:1;color:var(--kc)}
+.kpi-l{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af;margin-top:6px}
+.kpi-s{font-size:.73rem;color:#6b7280;margin-top:4px}
+.kpi-arrow{position:absolute;bottom:14px;right:14px;font-size:.72rem;color:#d1d5db;transition:all .2s}
+.kpi:hover .kpi-arrow{color:var(--kc);transform:translateX(3px)}
+.kc-blue{--kc:#3b82f6}.kc-green{--kc:#10b981}.kc-gold{--kc:#d97706}.kc-teal{--kc:#0891b2}.kc-purple{--kc:#7c3aed}.kc-indigo{--kc:#4f46e5}.kc-red{--kc:#dc2626}
+
+/* BUCKET GRID — shared by Attendance + Points */
+.bucket-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:900px){.bucket-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.bucket-grid{grid-template-columns:repeat(2,1fr)}}
+.bucket-grid.four{grid-template-columns:repeat(4,1fr)}
+@media(max-width:700px){.bucket-grid.four{grid-template-columns:repeat(2,1fr)}}
+.bkt{border-radius:16px;padding:18px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;border:2px solid transparent}
+.bkt:hover{transform:translateY(-3px);filter:brightness(1.04);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.bkt:active{transform:scale(.97)}
+.bkt-tag{position:absolute;top:10px;right:10px;font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:20px;background:rgba(0,0,0,.12);color:rgba(0,0,0,.5);letter-spacing:.5px;text-transform:uppercase}
+.bkt-icon{font-size:1.6rem;margin-bottom:8px}
+.bkt-n{font-size:1.75rem;font-weight:900;letter-spacing:-.5px}
+.bkt-l{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.bkt-r{font-size:.7rem;opacity:.65;margin-top:2px}
+.bkt-bar{height:4px;border-radius:4px;background:rgba(0,0,0,.1);margin-top:10px}
+.bkt-fill{height:100%;border-radius:4px;background:rgba(0,0,0,.22)}
+.bkt-pct{font-size:.72rem;font-weight:700;margin-top:6px;opacity:.8}
+
+/* Attendance bucket colours */
+.bkt-crit{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5}.bkt-crit .bkt-n,.bkt-crit .bkt-l{color:#b91c1c}
+.bkt-risk{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fdba74}.bkt-risk .bkt-n,.bkt-risk .bkt-l{color:#c2410c}
+.bkt-avg{background:linear-gradient(135deg,#fefce8,#fef9c3);border-color:#fde047}.bkt-avg .bkt-n,.bkt-avg .bkt-l{color:#92400e}
+.bkt-good{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac}.bkt-good .bkt-n,.bkt-good .bkt-l{color:#15803d}
+/* Points bucket colours */
+.bkt-p0{background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-color:#cbd5e1}.bkt-p0 .bkt-n,.bkt-p0 .bkt-l{color:#475569}
+.bkt-p1{background:linear-gradient(135deg,#fefce8,#fef9c3);border-color:#fde047}.bkt-p1 .bkt-n,.bkt-p1 .bkt-l{color:#92400e}
+.bkt-p2{background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fdba74}.bkt-p2 .bkt-n,.bkt-p2 .bkt-l{color:#c2410c}
+.bkt-p3{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-color:#7dd3fc}.bkt-p3 .bkt-n,.bkt-p3 .bkt-l{color:#0369a1}
+.bkt-p4{background:linear-gradient(135deg,#fdf4ff,#fae8ff);border-color:#e879f9}.bkt-p4 .bkt-n,.bkt-p4 .bkt-l{color:#7e22ce}
+
+/* CHARTS ROW */
+.crow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:700px){.crow{grid-template-columns:1fr}}
+.ccard{background:#fff;border-radius:16px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04)}
+.cc-t{font-size:.85rem;font-weight:700;color:#111827}.cc-s{font-size:.72rem;color:#9ca3af;margin-top:2px;margin-bottom:16px}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.dc{width:100px!important;height:100px!important;flex-shrink:0}
+.dleg{flex:1}
+.dli{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:6px;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .15s}
+.dli:hover{background:#f0f4ff}
+.dli-l{display:flex;align-items:center;gap:7px;font-size:.75rem;color:#374151;font-weight:500}
+.dli-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.dli-v{font-size:.75rem;font-weight:700;color:#111827}
+
+/* TWO COL */
+.tcol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+@media(max-width:700px){.tcol{grid-template-columns:1fr}}
+.dcard{background:#fff;border-radius:16px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04)}
+.bar-row{display:flex;align-items:center;gap:10px;padding:5px 7px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:3px}
+.bar-row:hover{background:#f0f4ff}
+.br-icon{font-size:.9rem;width:22px;text-align:center;flex-shrink:0}
+.br-lbl{font-size:.76rem;font-weight:500;color:#374151;min-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br-track{flex:1;background:#f1f5f9;border-radius:6px;height:7px;overflow:hidden}
+.br-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#3b82f6,#06b6d4)}
+.br-fill-gold{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.br-cnt{font-size:.76rem;font-weight:700;color:#111827;min-width:26px;text-align:right}
+.br-pct{font-size:.68rem;color:#9ca3af;min-width:32px;text-align:right}
+
+/* LEADERBOARD */
+.lcard{background:#fff;border-radius:16px;padding:22px;box-shadow:0 1px 4px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);margin-bottom:24px}
+.lb-table{width:100%;border-collapse:collapse}
+.lb-table th{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9ca3af;padding:0 10px 10px;text-align:left;border-bottom:1px solid #f1f5f9}
+.lb-table td{padding:11px 10px;border-bottom:1px solid #f8f9ff;vertical-align:middle}
+.lb-table tr:last-child td{border-bottom:none}
+.lb-table tr:hover td{background:#f8f9ff;cursor:pointer}
+.lb-name{font-weight:700;font-size:.82rem;color:#111827}
+.lb-roll{font-size:.67rem;color:#9ca3af}
+.pts-big{font-weight:900;font-size:.98rem;color:#d97706}
+.chip{display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:10px}
+.chip-g{background:#dcfce7;color:#15803d}.chip-y{background:#fef3c7;color:#92400e}.chip-r{background:#fee2e2;color:#b91c1c}
+.rtag{font-size:.65rem;background:#ede9fe;color:#5b21b6;padding:2px 7px;border-radius:10px;font-weight:600;white-space:nowrap}
+
+/* ═══ SEARCH VIEW ═══ */
+.srch-view{min-height:calc(100vh - 120px)}
+.srch-hero{background:linear-gradient(160deg,#0a0e33 0%,#0f1443 40%,#1e1b4b 100%);padding:52px 20px 60px;text-align:center;position:relative;overflow:hidden}
+.srch-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(99,102,241,.2) 0%,transparent 60%)}
+.srch-hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:48px;background:#f0f4ff;clip-path:ellipse(55% 100% at 50% 100%)}
+.sh-sub{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#6366f1;margin-bottom:12px}
+.sh-title{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.5px;margin-bottom:10px}
+.sh-desc{font-size:.85rem;color:#818cf8;max-width:400px;margin:0 auto}
+.srch-box{max-width:600px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:10}
+.srch-inner{background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(15,20,67,.2);padding:24px 24px 20px}
+.srch-row{display:flex;gap:10px;margin-bottom:10px}
+.srch-wrap{flex:1;display:flex;align-items:center;border:2px solid #e5e7eb;border-radius:12px;padding:0 16px;transition:all .2s;background:#fff}
+.srch-wrap:focus-within{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.srch-wrap input{flex:1;border:none;outline:none;font-size:.98rem;padding:14px 0;font-family:'Inter',sans-serif;color:#111827;background:transparent}
+.srch-wrap input::placeholder{color:#9ca3af}
+.srch-btn{background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .2s;box-shadow:0 4px 14px rgba(59,130,246,.4)}
+.srch-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.5)}
+.srch-btn:active{transform:scale(.97)}
+.srch-hint{font-size:.73rem;color:#9ca3af;display:flex;align-items:center;gap:5px}
+.srch-rest{max-width:600px;margin:24px auto 0;padding:0 16px 60px}
+#status-msg{text-align:center;padding:10px;font-size:.85rem;color:#6b7280}
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid #e5e7eb;border-top-color:#3b82f6;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ DETAIL VIEW — WIDE ═══ */
+.detail-main{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#64748b;background:none;border:none;cursor:pointer;padding:0;margin-bottom:20px;font-family:'Inter',sans-serif;transition:color .2s}
+.back-btn:hover{color:#3b82f6}
+
+/* Hero */
+.d-hero{background:linear-gradient(150deg,#0a0e33 0%,#0f1443 50%,#1e1b4b 100%);border-radius:20px;padding:32px;color:#fff;margin-bottom:14px;position:relative;overflow:hidden}
+.d-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 75% 25%,rgba(99,102,241,.3) 0%,transparent 55%);pointer-events:none}
+.d-hero-top{display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.d-av{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.15)}
+.d-inf{flex:1;min-width:180px}
+.d-nm{font-size:1.4rem;font-weight:900;letter-spacing:-.3px}
+.d-rl{font-size:.76rem;color:#a5b4fc;margin-top:3px}
+.d-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dtag{font-size:.68rem;font-weight:600;padding:3px 10px;border-radius:20px}
+.dt-paid{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+.dt-unpaid{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+.dt-sf{background:rgba(6,182,212,.2);color:#67e8f9;border:1px solid rgba(6,182,212,.3)}
+.dt-cert{background:rgba(245,158,11,.2);color:#fde68a;border:1px solid rgba(245,158,11,.3)}
+.dt-nc{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
+.d-rank-blk{margin-left:auto;text-align:center;flex-shrink:0}
+.d-re{font-size:2rem}
+.d-rn{font-size:.78rem;font-weight:700;color:#a5b4fc;margin-top:4px}
+.d-pts-lbl{font-size:.75rem;color:#fbbf24;margin-top:3px;font-weight:800}
+
+/* Position strip inside hero */
+.d-positions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);position:relative;z-index:1}
+.pos-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;flex:1;min-width:120px;text-align:center;transition:background .2s}
+.pos-card:hover{background:rgba(255,255,255,.12)}
+.pos-num{font-size:1.4rem;font-weight:900;color:#fff;line-height:1}
+.pos-of{font-size:.65rem;color:#a5b4fc;font-weight:500}
+.pos-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#818cf8;margin-top:5px}
+.pos-badge{display:inline-block;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
+.pos-top10{background:rgba(245,158,11,.25);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.pos-top25{background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)}
+.pos-avg{background:rgba(255,255,255,.1);color:#a5b4fc}
+
+/* 4-stat row */
+.dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:500px){.dstats{grid-template-columns:repeat(2,1fr)}}
+.dstat{background:#fff;border-radius:14px;padding:18px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);border-bottom:3px solid #f1f5f9;transition:border-color .2s}
+.dstat:hover{border-color:#3b82f6}
+.dstat-n{font-size:1.5rem;font-weight:900;color:#1d4ed8;letter-spacing:-.3px}
+.dstat-n.gold{color:#d97706}
+.dstat-n.green{color:#059669}
+.dstat-l{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-top:5px}
+
+/* Wide info grid: 3 columns */
+.ig{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:720px){.ig{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.ig{grid-template-columns:1fr}}
+.ic{background:#fff;border-radius:14px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ic.span2{grid-column:span 2}
+.ic.full{grid-column:1/-1}
+.ic-t{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:#3b82f6;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.ic-r{margin-bottom:10px}.ic-r:last-child{margin-bottom:0}
+.ic-l{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;margin-bottom:2px}
+.ic-v{font-size:.84rem;font-weight:500;color:#111827;word-break:break-word}
+.ic-v a{color:#3b82f6;text-decoration:none}.ic-v a:hover{text-decoration:underline}
+.tw{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tg{background:#ede9fe;color:#5b21b6;border-radius:6px;padding:3px 8px;font-size:.68rem;font-weight:500}
+.tg-s{background:#fff7ed;color:#c2410c}
+.att-sum{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ap{font-size:.74rem;font-weight:600;padding:4px 11px;border-radius:20px}
+.app{background:#dcfce7;color:#15803d}.apa{background:#fee2e2;color:#b91c1c}.ap-pct{background:#dbeafe;color:#1d4ed8}
+.att-tw{overflow-x:auto}
+.att-t{width:100%;border-collapse:collapse;font-size:.8rem}
+.att-t th{background:#0f1443;color:#e2e8f0;padding:9px 14px;text-align:center;font-size:.68rem;font-weight:600}
+.att-t th:first-child{text-align:left;border-radius:8px 0 0 0}.att-t th:last-child{border-radius:0 8px 0 0}
+.att-t td{padding:8px 14px;text-align:center;border-bottom:1px solid #f0f4ff}
+.att-t td:first-child{text-align:left;font-weight:600}
+.att-t tr:last-child td{border-bottom:none}.att-t tr:hover td{background:#f8f9ff}
+.dot{display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;font-size:.68rem;font-weight:700}
+.dp{background:#dcfce7;color:#15803d}.da{background:#fee2e2;color:#b91c1c}.ds{background:#f3f4f6;color:#6b7280}.dh{background:#fef9c3;color:#854d0e}.dn{background:#f9fafb;color:#d1d5db}
+.att-merged td{background:#f8faff;}
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:.68rem;color:#6b7280}
+.leg span{display:flex;align-items:center;gap:4px}
+
+/* ═══ MODAL — ALWAYS CENTERED ═══ */
+.modal-bg{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(5px);
+  z-index:500;
+  display:flex;
+  align-items:center;        /* always centered vertically */
+  justify-content:center;
+  padding:16px;
+  animation:fdin .18s ease;
+}
+@keyframes fdin{from{opacity:0}to{opacity:1}}
+.modal{
+  background:#fff;
+  border-radius:20px;
+  width:100%;
+  max-width:660px;
+  max-height:85vh;
+  display:flex;
+  flex-direction:column;
+  animation:mpin .2s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.25);
+}
+@keyframes mpin{from{transform:scale(.94) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-hdr{padding:20px 20px 0;flex-shrink:0}
+.modal-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.modal-title{font-size:1rem;font-weight:800;color:#0f1443}
+.modal-sub{font-size:.74rem;color:#9ca3af;margin-top:2px}
+.modal-close{background:#f3f4f6;border:none;font-size:1rem;cursor:pointer;color:#6b7280;padding:6px 10px;border-radius:8px;line-height:1;transition:all .2s;font-weight:700}
+.modal-close:hover{background:#e5e7eb;color:#111827}
+.modal-srch-wrap{display:flex;align-items:center;border:1.5px solid #e5e7eb;border-radius:10px;padding:0 12px;background:#f8faff;transition:border-color .2s;margin-bottom:10px}
+.modal-srch-wrap:focus-within{border-color:#3b82f6;background:#fff}
+.modal-srch-wrap input{flex:1;border:none;outline:none;padding:10px 0;font-size:.84rem;font-family:'Inter',sans-serif;background:transparent;color:#111827}
+.modal-srch-wrap input::placeholder{color:#b0b8cc}
+.modal-count{font-size:.72rem;color:#9ca3af;padding:0 2px 8px;font-weight:500}
+.modal-list{overflow-y:auto;flex:1;padding:0 12px 16px}
+.m-row{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px;cursor:pointer;transition:background .15s;border-bottom:1px solid #f8f9ff}
+.m-row:last-child{border-bottom:none}
+.m-row:hover{background:#f0f4ff}
+.m-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#fff;flex-shrink:0}
+.m-info{flex:1;min-width:0}
+.m-name{font-size:.83rem;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-roll{font-size:.68rem;color:#9ca3af}
+.m-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.mchip{font-size:.64rem;font-weight:600;padding:2px 7px;border-radius:10px}
+.mc-g{background:#dcfce7;color:#15803d}.mc-y{background:#fef3c7;color:#92400e}.mc-r{background:#fee2e2;color:#b91c1c}
+.mc-pts{background:#fef3c7;color:#92400e}.mc-bdg{background:#ede9fe;color:#5b21b6}
+.mc-rank{background:#f0f4ff;color:#3b82f6}
+.m-pts-val{font-size:.82rem;font-weight:800;color:#d97706;white-space:nowrap;flex-shrink:0}
+.modal-empty{text-align:center;padding:32px;color:#9ca3af;font-size:.85rem}
+
+/* Error / not found */
+.err-box{background:#fff5f5;border-left:4px solid #ef4444;border-radius:12px;padding:14px 18px;font-size:.84rem;color:#b91c1c}
+.nf-card{text-align:center;padding:48px 20px;background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+
+footer{text-align:center;padding:20px;font-size:.7rem;color:#9ca3af}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg></div>
+    Student Canvas
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab on" id="nt-dash" onclick="showView('dash')">📊 Dashboard</button>
+    <button class="nav-tab" id="nt-srch" onclick="showView('search')">🔍 Search Student</button>
+  </div>
+  <div class="live-dot"><div class="ld"></div>Live</div>
+</nav>
+
+<!-- STATS BAR -->
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<div id="view-dash" class="view on">
+  <div class="dmain">
+    <div class="dhdr">
+      <div class="dhdr-l">
+        <h2>Training Overview Dashboard</h2>
+        <p>Live stats from Google Sheets — click any card or bucket to see the students inside</p>
+      </div>
+      <div class="sync-tag"><div class="ld" style="background:#3b82f6"></div><span id="sync-t">Syncing…</span></div>
+    </div>
+
+    <div id="dash-loading" style="text-align:center;padding:80px;color:#9ca3af"><span class="spinner"></span> Loading cohort data…</div>
+
+    <div id="dash-body" style="display:none">
+
+      <div class="slbl">Key Metrics</div>
+      <div class="kgrid" id="kgrid"></div>
+
+      <div class="slbl">Attendance Health — click to see students</div>
+      <div class="bucket-grid four" id="att-buckets"></div>
+
+      <div class="slbl">Points Health — click to see students</div>
+      <div class="bucket-grid" id="pts-buckets"></div>
+
+      <div class="slbl">Status Breakdown</div>
+      <div class="crow">
+        <div class="ccard">
+          <div class="cc-t">Certification Status</div>
+          <div class="cc-s">SF Agentic AI Certification</div>
+          <div class="donut-wrap"><canvas class="dc" id="c-cert"></canvas><div class="dleg" id="l-cert"></div></div>
+        </div>
+        <div class="ccard">
+          <div class="cc-t">SF Registration</div>
+          <div class="cc-s">Registered on Salesforce</div>
+          <div class="donut-wrap"><canvas class="dc" id="c-sf"></canvas><div class="dleg" id="l-sf"></div></div>
+        </div>
+        <div class="ccard">
+          <div class="cc-t">Payment Status</div>
+          <div class="cc-s">Training fee collection</div>
+          <div class="donut-wrap"><canvas class="dc" id="c-pay"></canvas><div class="dleg" id="l-pay"></div></div>
+        </div>
+      </div>
+
+      <div class="slbl">Trailhead Distribution</div>
+      <div class="tcol">
+        <div class="dcard">
+          <div class="cc-t">Rank Distribution</div>
+          <div class="cc-s" style="margin-bottom:14px">Click a rank to view students</div>
+          <div id="rank-rows"></div>
+        </div>
+        <div class="dcard">
+          <div class="cc-t">Badge Distribution</div>
+          <div class="cc-s" style="margin-bottom:14px">Click a range to filter</div>
+          <div id="badge-rows"></div>
+        </div>
+      </div>
+
+      <div class="slbl">Points Leaderboard ⚡</div>
+      <div class="lcard">
+        <div class="cc-t" style="margin-bottom:2px">Top 10 Students by Trailhead Points</div>
+        <div class="cc-s" style="margin-bottom:14px">Click any row to view full profile</div>
+        <table class="lb-table"><thead><tr>
+          <th>#</th><th>Student</th><th>Rank</th><th>Attendance</th><th>Badges</th><th style="text-align:right">⚡ Points</th>
+        </tr></thead><tbody id="lb-body"></tbody></table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SEARCH ═══════════ -->
+<div id="view-search" class="view">
+  <div class="srch-view">
+    <div class="srch-hero">
+      <div class="sh-sub">Student Portal</div>
+      <div class="sh-title">Find Your<br/>Training Profile</div>
+      <div class="sh-desc">Enter your roll number to view attendance, Salesforce credentials, badges &amp; your cohort ranking</div>
+    </div>
+    <div class="srch-box">
+      <div class="srch-inner">
+        <div class="srch-row">
+          <div class="srch-wrap">
+            <span style="color:#9ca3af;margin-right:8px;flex-shrink:0">🔍</span>
+            <input id="rollInput" type="text" placeholder="Enter roll number" autocomplete="off" autocapitalize="characters"/>
+          </div>
+          <button class="srch-btn" onclick="searchStudent()">Search</button>
+        </div>
+        <div class="srch-hint">💡 You can also type just the last 4 digits of your roll number</div>
+      </div>
+    </div>
+    <div class="srch-rest"><div id="status-msg"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════ DETAIL ═══════════ -->
+<div id="view-detail" class="view">
+  <div class="detail-main">
+    <button class="back-btn" id="detail-back">← Back</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL — CENTERED ═══════════ -->
+<div id="modal-bg" class="modal-bg" style="display:none" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-top">
+        <div>
+          <div class="modal-title" id="modal-title">Students</div>
+          <div class="modal-sub" id="modal-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕ Close</button>
+      </div>
+      <div class="modal-srch-wrap">
+        <span style="color:#9ca3af;margin-right:8px;font-size:.85rem">🔍</span>
+        <input id="modal-srch" type="text" placeholder="Search by name or roll number…" oninput="filterModal()"/>
+      </div>
+      <div class="modal-count" id="modal-count"></div>
+    </div>
+    <div class="modal-list" id="modal-list"></div>
+  </div>
+</div>
+
+<footer>Student Training Portfolio Portal &nbsp;·&nbsp; ⚡ All stats are computed live from Google Sheets on every page load</footer>
+
+<script>
+/* ── CONFIG ── */
+const SHEET_ID   = '1_gDwlUC9FEtOq7ZdYojOoLpn021RHoFsJRzgO2_3p-M';
+const SHEET_NAME = 'Registered User';
+const RD=2,RH=3,RS=4;
+/* ── DYNAMIC COLUMN MAP ──────────────────────────────────────────────────
+   Scans the header row at runtime so adding/reordering columns in the sheet
+   never breaks the portal. Each entry: [C-key, ...keyword fragments to match]
+   All fragments must appear (case-insensitive) in the header cell text.
+   The FIRST matching column wins. attStart = first column labelled "Forenoon".
+──────────────────────────────────────────────────────────────────────── */
+const COL_RULES=[
+  ['pay',     ['payment']],
+  ['att',     ['attendance','%']],
+  ['att',     ['attendance','percent']],
+  ['pre',     ['present','count']],
+  ['pre',     ['no.','present']],
+  ['abs',     ['absent','count']],
+  ['abs',     ['no.','absent']],
+  ['roll',    ['roll']],
+  ['name',    ['student','name']],
+  ['name',    ['name']],
+  ['phone',   ['phone']],
+  ['phone',   ['mobile']],
+  ['email',   ['email']],
+  ['m1',      ['module','1']],
+  ['m2',      ['module','2']],
+  ['cgpa',    ['cgpa']],
+  ['cgpa',    ['gpa']],
+  ['sf',      ['salesforce','reg']],
+  ['sf',      ['sf','reg']],
+  ['cert',    ['certif']],
+  ['course',  ['course']],
+  ['thUrl',   ['trailhead','url']],
+  ['thUrl',   ['th','url']],
+  ['rank',    ['sf','rank']],
+  ['rank',    ['salesforce','rank']],
+  ['rank',    ['rank']],
+  ['pts',     ['points']],
+  ['pts',     ['pts']],
+  ['bdgList', ['badge','list']],
+  ['stmList', ['stamp','list']],
+  ['bdg',     ['badge','count']],
+  ['bdg',     ['no.','badge']],
+  ['bdg',     ['badges']],
+  ['stm',     ['stamp','count']],
+  ['stm',     ['no.','stamp']],
+  ['stm',     ['stamps']],
+  ['tbId',    ['trailblazer','id']],
+  ['tbId',    ['tb','id']],
+  ['err',     ['error']],
+  ['err',     ['remark']],
+];
+let C={pay:0,att:1,pre:2,abs:3,roll:4,name:5,phone:6,email:7,m1:8,m2:9,cgpa:10,sf:11,cert:12,course:13,thUrl:14,rank:15,pts:16,bdg:17,stm:18,bdgList:19,stmList:20,tbId:21,err:22,attStart:23};
+function buildC(t){
+  const hr=t.rows[RH].c;
+  const maxCol=hr.length;
+  const newC={attStart:maxCol};
+  const assigned=new Set();
+  for(let i=0;i<maxCol;i++){
+    const raw=hr[i]?String(hr[i].v||'').trim().toLowerCase():'';
+    if(!raw)continue;
+    /* detect attendance start */
+    if(raw==='forenoon'&&newC.attStart===maxCol){newC.attStart=i;continue;}
+    if(raw==='afternoon')continue;
+    /* match named columns — first rule that matches and hasn't been assigned wins */
+    for(const[key,frags] of COL_RULES){
+      if(assigned.has(key))continue;
+      if(frags.every(f=>raw.includes(f))){newC[key]=i;assigned.add(key);break;}
+    }
+  }
+  /* fallback: keep original hardcoded values for anything not found */
+  C=Object.assign({},C,newC);
+}
+const RANKS={Trailblazer:'🌟',Explorer:'🔭',Hiker:'🥾',Mountaineer:'⛰️',Expeditioner:'🧭',Ranger:'🏕️','Double Star Ranger':'⭐','Triple Star Ranger':'🌠',Adventurer:'🏔️',Pioneer:'🚀',Pathfinder:'🛤️',Scout:'🔍',Master:'👑'};
+const ri=r=>{if(!r)return'🌟';for(const[k,v]of Object.entries(RANKS))if(r.toLowerCase().includes(k.toLowerCase()))return v;return'🌟';};
+
+/* ── FETCH ── */
+let cache=null;
+function fetchSheet(){
+  if(cache)return Promise.resolve(cache);
+  return new Promise((res,rej)=>{
+    const cb='__g'+Date.now();
+    const t=setTimeout(()=>{cl();rej(new Error('Timed out. Share sheet as "Anyone with link can view".'))},14000);
+    function cl(){clearTimeout(t);delete window[cb];document.getElementById('__gs')?.remove();}
+    window[cb]=r=>{cl();r.status==='error'?rej(new Error(r.errors?.[0]?.message||'Sheet error')):(cache=r.table,res(r.table));};
+    const s=document.createElement('script');s.id='__gs';
+    s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    s.onerror=()=>{cl();rej(new Error('Could not reach Google Sheets.'));};
+    document.body.appendChild(s);
+  });
+}
+const gv=(r,i)=>r.c[i]?r.c[i].v:null;
+
+/* ── VIEWS ── */
+function showView(v){
+  ['dash','search','detail'].forEach(n=>document.getElementById('view-'+n).classList.toggle('on',n===v));
+  document.getElementById('nt-dash').classList.toggle('on',v==='dash');
+  document.getElementById('nt-srch').classList.toggle('on',v==='search'||v==='detail');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── MODAL ── */
+let modalAll=[];
+function openModal(students,title,sub){
+  modalAll=students;
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-sub').textContent=sub||'';
+  document.getElementById('modal-srch').value='';
+  renderModalList(modalAll);
+  document.getElementById('modal-bg').style.display='flex';
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('modal-srch').focus(),250);
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modal-bg'))return;
+  document.getElementById('modal-bg').style.display='none';
+  document.body.style.overflow='';
+}
+function filterModal(){
+  const q=document.getElementById('modal-srch').value.trim().toLowerCase();
+  renderModalList(q?modalAll.filter(s=>s.name.toLowerCase().includes(q)||String(s.roll).toLowerCase().includes(q)):modalAll);
+}
+function renderModalList(list){
+  document.getElementById('modal-count').textContent=list.length+' student'+(list.length!==1?'s':'');
+  if(!list.length){document.getElementById('modal-list').innerHTML='<div class="modal-empty">No students match</div>';return;}
+  document.getElementById('modal-list').innerHTML=list.map(s=>{
+    const an=parseFloat(s.att);
+    const ac=an>=75?'mc-g':an>=50?'mc-y':'mc-r';
+    return`<div class="m-row" onclick="viewStudentFromModal('${s.roll}')">
+      <div class="m-av">${(s.name[0]||'?').toUpperCase()}</div>
+      <div class="m-info">
+        <div class="m-name">${s.name}</div>
+        <div class="m-roll">${s.roll}</div>
+        <div class="m-chips">
+          <span class="mchip ${ac}">${s.att}% Att</span>
+          <span class="mchip mc-bdg">${s.bdg} Badges</span>
+          ${s.rank?`<span class="mchip mc-rank">${ri(s.rank)} ${s.rank}</span>`:''}
+        </div>
+      </div>
+      <div class="m-pts-val">⚡${Number(s.pts).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+function viewStudentFromModal(roll){
+  closeModal();
+  if(!cache)return;
+  const row=findRow(cache,roll.toUpperCase());
+  if(row){document.getElementById('detail-back').onclick=()=>{showView('dash');};renderDetail(cache,row);}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ── DONUT ── */
+function mkDonut(id,items,colors){
+  new Chart(document.getElementById(id).getContext('2d'),{type:'doughnut',data:{labels:items.map(d=>d.l),datasets:[{data:items.map(d=>d.v),backgroundColor:colors,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},options:{cutout:'70%',plugins:{legend:{display:false}},animation:{duration:700}}});
+}
+
+/* ── STUDENTS ARRAY ── */
+let allStudents=[];
+
+/* ── DASHBOARD ── */
+async function loadDash(){
+  try{
+    const t=await fetchSheet();
+    buildC(t); /* build dynamic column map from header row */
+    /* cap maxCol to last column with a date — avoids looping 1000 empty Google Sheets cols */
+    const hr=t.rows[RH].c;
+    const drCheck=t.rows[RD];
+    let maxCol=C.attStart;
+    for(let i=hr.length-1;i>=C.attStart;i--){
+      if(drCheck.c[i]&&drCheck.c[i].v!=null){maxCol=i+2;break;}
+    }
+    if(maxCol<=C.attStart)maxCol=hr.length;
+    const computeAtt=(r)=>{
+      let p=0,tot=0;
+      for(let i=C.attStart;i<maxCol;i++){
+        const v=gv(r,i);
+        if(v==='Present'){p++;tot++;}
+        else if(v==='Absent'){tot++;}
+      }
+      if(tot>0)return((p/tot)*100).toFixed(1);
+      /* fallback: pre-computed column — handle both decimal (0.75) and % (75) */
+      const a=gv(r,C.att);
+      if(a==null)return'0.0';
+      return(a<=1?(a*100):a).toFixed(1);
+    };
+    allStudents=t.rows.slice(RS).filter(r=>r.c[C.roll]&&r.c[C.roll].v).map(r=>({
+      roll:String(gv(r,C.roll)).trim(),name:(gv(r,C.name)||'').trim(),
+      att:computeAtt(r),
+      pre:gv(r,C.pre)||0,abs:gv(r,C.abs)||0,
+      pts:gv(r,C.pts)||0,bdg:gv(r,C.bdg)||0,stm:gv(r,C.stm)||0,
+      rank:gv(r,C.rank)||'',cert:gv(r,C.cert)||'',sf:gv(r,C.sf)||'',pay:gv(r,C.pay)||'',
+      email:gv(r,C.email)||'',phone:gv(r,C.phone)?String(gv(r,C.phone)):'',
+      cgpa:gv(r,C.cgpa),course:gv(r,C.course)||'',thUrl:gv(r,C.thUrl)||'',tbId:gv(r,C.tbId)||'',
+      bdgList:gv(r,C.bdgList)||'',stmList:gv(r,C.stmList)||'',err:gv(r,C.err)||''
+    }));
+    const n=allStudents.length;
+    const isPaid=s=>{const p=s.pay.toLowerCase();return p.includes('paid')&&!p.includes('not');};
+    const paid=allStudents.filter(isPaid).length;
+    const sfYes=allStudents.filter(s=>s.sf==='Yes').length;
+    const certYes=allStudents.filter(s=>s.cert==='Yes').length;
+    const avgAtt=(allStudents.reduce((a,s)=>a+parseFloat(s.att),0)/n).toFixed(1);
+    const avgBdg=(allStudents.reduce((a,s)=>a+s.bdg,0)/n).toFixed(1);
+    const totPts=allStudents.reduce((a,s)=>a+s.pts,0);
+    const avgPts=Math.round(totPts/n);
+    const att75=allStudents.filter(s=>parseFloat(s.att)>=75).length;
+    const att50=allStudents.filter(s=>{const a=parseFloat(s.att);return a>=50&&a<75;}).length;
+    const att25=allStudents.filter(s=>{const a=parseFloat(s.att);return a>=25&&a<50;}).length;
+    const att0=allStudents.filter(s=>parseFloat(s.att)<25).length;
+
+    /* STATS BAR (elements removed — update only if still present) */
+    const _set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    _set('sbar-lbl',`${n} candidates synchronized`);
+    _set('sb-n',n);_set('sb-att',avgAtt+'%');_set('sb-pts',avgPts.toLocaleString());
+    _set('sb-bdg',avgBdg);_set('sb-cert',certYes+' ('+((certYes/n)*100).toFixed(0)+'%)');
+    const sbarR=document.getElementById('sbar-r');if(sbarR)sbarR.style.display='flex';
+    _set('sync-t','Synced at '+new Date().toLocaleTimeString());
+
+    /* KPI GRID */
+    const kpis=[
+      {icon:'👥',n:n,l:'Total Students',s:'Registered in program',c:'kc-blue',f:()=>allStudents,ft:'All Students'},
+      {icon:'📅',n:avgAtt+'%',l:'Avg Attendance',s:att75+' above 75%',c:'kc-green',f:()=>[...allStudents].sort((a,b)=>parseFloat(b.att)-parseFloat(a.att)),ft:'All Students by Attendance'},
+      {icon:'🏅',n:certYes,l:'Certified',s:((certYes/n)*100).toFixed(0)+'% of cohort',c:'kc-gold',f:()=>allStudents.filter(s=>s.cert==='Yes'),ft:'Certified Students'},
+      {icon:'☁',n:sfYes,l:'SF Registered',s:((sfYes/n)*100).toFixed(0)+'% rate',c:'kc-teal',f:()=>allStudents.filter(s=>s.sf==='Yes'),ft:'SF Registered Students'},
+      {icon:'⚡',n:(totPts/1e6).toFixed(1)+'M',l:'Total Points',s:'Avg '+avgPts.toLocaleString()+'/student',c:'kc-gold',f:()=>[...allStudents].sort((a,b)=>b.pts-a.pts),ft:'Students by Points'},
+      {icon:'🏆',n:avgBdg,l:'Avg Badges',s:allStudents.filter(s=>s.bdg>100).length+' with 100+',c:'kc-purple',f:()=>[...allStudents].sort((a,b)=>b.bdg-a.bdg),ft:'Students by Badges'},
+      {icon:'💳',n:paid,l:'Fees Paid',s:((paid/n)*100).toFixed(0)+'% payment rate',c:'kc-red',f:()=>allStudents.filter(isPaid),ft:'Students Who Paid'},
+      {icon:'⚠️',n:allStudents.filter(s=>s.err&&s.err.trim()).length,l:'Invalid Profiles',s:'Check Errors column',c:'kc-indigo',f:()=>allStudents.filter(s=>s.err&&s.err.trim()),ft:'Invalid Profiles — Errors'},
+    ];
+    document.getElementById('kgrid').innerHTML=kpis.map((k,i)=>`
+      <div class="kpi ${k.c}" onclick="openModal(kpiFns[${i}](),'${k.ft}','')">
+        <div class="kpi-glow"></div>
+        <div class="kpi-icon">${k.icon}</div>
+        <div class="kpi-n">${k.n}</div>
+        <div class="kpi-l">${k.l}</div>
+        <div class="kpi-s">${k.s}</div>
+        <div class="kpi-arrow">→</div>
+      </div>`).join('');
+    window.kpiFns=kpis.map(k=>k.f);
+
+    /* ATTENDANCE BUCKETS */
+    const aBkts=[
+      {cls:'bkt-crit',icon:'🚨',n:att0,l:'Critical',r:'< 25%',f:()=>allStudents.filter(s=>parseFloat(s.att)<25).sort((a,b)=>parseFloat(a.att)-parseFloat(b.att))},
+      {cls:'bkt-risk',icon:'⚠️',n:att25,l:'At Risk',r:'25% – 50%',f:()=>allStudents.filter(s=>{const a=parseFloat(s.att);return a>=25&&a<50;})},
+      {cls:'bkt-avg',icon:'📊',n:att50,l:'Average',r:'50% – 75%',f:()=>allStudents.filter(s=>{const a=parseFloat(s.att);return a>=50&&a<75;})},
+      {cls:'bkt-good',icon:'✅',n:att75,l:'Good',r:'> 75%',f:()=>allStudents.filter(s=>parseFloat(s.att)>=75).sort((a,b)=>parseFloat(b.att)-parseFloat(a.att))},
+    ];
+    document.getElementById('att-buckets').innerHTML=aBkts.map((b,i)=>`
+      <div class="bkt ${b.cls}" onclick="openModal(attFns[${i}](),'Attendance: ${b.l}','Students with ${b.r} attendance')">
+        <div class="bkt-tag">Click to view</div>
+        <div class="bkt-icon">${b.icon}</div>
+        <div class="bkt-n">${b.n}</div>
+        <div class="bkt-l">${b.l}</div>
+        <div class="bkt-r">${b.r}</div>
+        <div class="bkt-bar"><div class="bkt-fill" style="width:${((b.n/n)*100).toFixed(0)}%"></div></div>
+        <div class="bkt-pct">${((b.n/n)*100).toFixed(0)}% of cohort</div>
+      </div>`).join('');
+    window.attFns=aBkts.map(b=>b.f);
+
+    /* POINTS BUCKETS */
+    const pts0=allStudents.filter(s=>s.pts===0).length;
+    const pts10=allStudents.filter(s=>s.pts>0&&s.pts<10000).length;
+    const pts50=allStudents.filter(s=>s.pts>=10000&&s.pts<50000).length;
+    const pts100=allStudents.filter(s=>s.pts>=50000&&s.pts<100000).length;
+    const pts100p=allStudents.filter(s=>s.pts>=100000).length;
+    const pBkts=[
+      {cls:'bkt-p0',icon:'😶',n:pts0,l:'No Points',r:'0 pts',f:()=>allStudents.filter(s=>s.pts===0)},
+      {cls:'bkt-p1',icon:'🌱',n:pts10,l:'Starter',r:'1 – 10K',f:()=>allStudents.filter(s=>s.pts>0&&s.pts<10000).sort((a,b)=>b.pts-a.pts)},
+      {cls:'bkt-p2',icon:'📈',n:pts50,l:'Active',r:'10K – 50K',f:()=>allStudents.filter(s=>s.pts>=10000&&s.pts<50000).sort((a,b)=>b.pts-a.pts)},
+      {cls:'bkt-p3',icon:'🔥',n:pts100,l:'Achiever',r:'50K – 100K',f:()=>allStudents.filter(s=>s.pts>=50000&&s.pts<100000).sort((a,b)=>b.pts-a.pts)},
+      {cls:'bkt-p4',icon:'🚀',n:pts100p,l:'Champion',r:'100K+',f:()=>allStudents.filter(s=>s.pts>=100000).sort((a,b)=>b.pts-a.pts)},
+    ];
+    document.getElementById('pts-buckets').innerHTML=pBkts.map((b,i)=>`
+      <div class="bkt ${b.cls}" onclick="openModal(ptsFns[${i}](),'Points: ${b.l}','Students with ${b.r} points')">
+        <div class="bkt-tag">Click to view</div>
+        <div class="bkt-icon">${b.icon}</div>
+        <div class="bkt-n">${b.n}</div>
+        <div class="bkt-l">${b.l}</div>
+        <div class="bkt-r">${b.r}</div>
+        <div class="bkt-bar"><div class="bkt-fill" style="width:${((b.n/n)*100).toFixed(0)}%"></div></div>
+        <div class="bkt-pct">${((b.n/n)*100).toFixed(0)}% of cohort</div>
+      </div>`).join('');
+    window.ptsFns=pBkts.map(b=>b.f);
+
+    /* DONUT CHARTS */
+    const certI=[{l:'Certified',v:certYes},{l:'Not Yet',v:n-certYes}];
+    const sfI=[{l:'Registered',v:sfYes},{l:'Not Reg.',v:n-sfYes}];
+    const payI=[{l:'Paid',v:paid},{l:'Not Paid',v:n-paid}];
+    mkDonut('c-cert',certI,['#10b981','#e5e7eb']);
+    mkDonut('c-sf',sfI,['#06b6d4','#e5e7eb']);
+    mkDonut('c-pay',payI,['#3b82f6','#fecaca']);
+    const mkLeg=(id,items,colors,fns,title)=>{
+      document.getElementById(id).innerHTML=items.map((it,i)=>`
+        <div class="dli" data-i="${i}" data-title="${title}: ${it.l}" data-cnt="${it.v}">
+          <div class="dli-l"><div class="dli-dot" style="background:${colors[i]}"></div>${it.l}</div>
+          <div class="dli-v">${it.v} <span style="color:#9ca3af;font-weight:400">(${((it.v/n)*100).toFixed(0)}%)</span></div>
+        </div>`).join('');
+      document.querySelectorAll(`#${id} .dli`).forEach((el,i)=>{
+        el.onclick=()=>openModal(allStudents.filter(fns[i]),`${title}: ${items[i].l}`,`${items[i].v} students`);
+      });
+    };
+    const isPaidFn=s=>isPaid(s);
+    mkLeg('l-cert',certI,['#10b981','#e5e7eb'],[s=>s.cert==='Yes',s=>s.cert!=='Yes'],'Certification');
+    mkLeg('l-sf',sfI,['#06b6d4','#e5e7eb'],[s=>s.sf==='Yes',s=>s.sf!=='Yes'],'SF Registration');
+    mkLeg('l-pay',payI,['#3b82f6','#fecaca'],[isPaid,s=>!isPaid(s)],'Payment');
+
+    /* RANK DISTRIBUTION */
+    const rankMap={};allStudents.forEach(s=>{const rk=s.rank||'Unknown';rankMap[rk]=(rankMap[rk]||0)+1;});
+    const rankSorted=Object.entries(rankMap).sort((a,b)=>b[1]-a[1]);
+    const maxR=rankSorted[0][1];
+    document.getElementById('rank-rows').innerHTML=rankSorted.map(([rk,cnt])=>`
+      <div class="bar-row" onclick="openModal(allStudents.filter(s=>s.rank===${JSON.stringify(rk)}),'${rk}','${cnt} students')">
+        <span class="br-icon">${ri(rk)}</span>
+        <span class="br-lbl">${rk}</span>
+        <div class="br-track"><div class="br-fill" style="width:${(cnt/maxR*100).toFixed(0)}%"></div></div>
+        <span class="br-cnt">${cnt}</span>
+        <span class="br-pct">${((cnt/n)*100).toFixed(0)}%</span>
+      </div>`).join('');
+
+    /* BADGE DISTRIBUTION */
+    const bdgDefs=[
+      {l:'0 Badges',f:s=>s.bdg===0},{l:'1–10',f:s=>s.bdg>=1&&s.bdg<=10},
+      {l:'11–50',f:s=>s.bdg>=11&&s.bdg<=50},{l:'51–100',f:s=>s.bdg>=51&&s.bdg<=100},{l:'100+',f:s=>s.bdg>100},
+    ];
+    const bdgCnts=bdgDefs.map(d=>({...d,cnt:allStudents.filter(d.f).length}));
+    const maxB=Math.max(...bdgCnts.map(b=>b.cnt));
+    window.bdgFns=bdgDefs.map(d=>d.f);
+    document.getElementById('badge-rows').innerHTML=bdgCnts.map((b,i)=>`
+      <div class="bar-row" onclick="openModal(allStudents.filter(bdgFns[${i}]),'Badges: ${b.l}','${b.cnt} students')">
+        <span class="br-lbl" style="min-width:80px">${b.l}</span>
+        <div class="br-track"><div class="br-fill br-fill-gold" style="width:${(b.cnt/maxB*100).toFixed(0)}%"></div></div>
+        <span class="br-cnt">${b.cnt}</span>
+        <span class="br-pct">${((b.cnt/n)*100).toFixed(0)}%</span>
+      </div>`).join('');
+
+    /* TOP 10 LEADERBOARD */
+    const medals=['🥇','🥈','🥉'];
+    const top10=[...allStudents].sort((a,b)=>b.pts-a.pts).slice(0,10);
+    const ac=a=>{const v=parseFloat(a);return v>=75?'chip-g':v>=50?'chip-y':'chip-r';};
+    document.getElementById('lb-body').innerHTML=top10.map((s,i)=>`
+      <tr onclick="viewStudentFromModal('${s.roll}')" style="cursor:pointer">
+        <td>${medals[i]||`<span style="color:#9ca3af;font-size:.8rem">${i+1}</span>`}</td>
+        <td><div class="lb-name">${s.name}</div><div class="lb-roll">${s.roll}</div></td>
+        <td><span class="rtag">${ri(s.rank)} ${s.rank||'—'}</span></td>
+        <td><span class="chip ${ac(s.att)}">${s.att}%</span></td>
+        <td><span style="font-weight:700;color:#5b21b6">${s.bdg}</span></td>
+        <td style="text-align:right"><span class="pts-big">⚡ ${Number(s.pts).toLocaleString()}</span></td>
+      </tr>`).join('');
+
+    document.getElementById('dash-loading').style.display='none';
+    document.getElementById('dash-body').style.display='block';
+
+  }catch(e){
+    document.getElementById('dash-loading').innerHTML=`<div class="err-box">⚠️ <strong>Could not load data.</strong> Ensure the sheet is shared as "Anyone with the link can view".<br><small style="opacity:.7">${e.message}</small></div>`;
+  }
+}
+
+/* ── SEARCH ── */
+async function searchStudent(){
+  const raw=document.getElementById('rollInput').value.trim().toUpperCase();
+  if(!raw){setStatus('<span style="color:#ef4444">Please enter a roll number.</span>');return;}
+  setStatus('<span class="spinner"></span> Searching…');
+  try{
+    const t=await fetchSheet();
+    buildC(t); /* ensure column map is up to date */
+    const row=findRow(t,raw);
+    if(!row){
+      setStatus('');
+      document.getElementById('detail-content').innerHTML=`<div class="nf-card"><div style="font-size:3rem;margin-bottom:12px">🔍</div><h3 style="font-weight:800;font-size:1.05rem">No student found for "${raw}"</h3><p style="color:#9ca3af;margin-top:6px;font-size:.83rem">Check your roll number or try the last 4 digits.</p></div>`;
+      document.getElementById('detail-back').onclick=()=>showView('search');
+      showView('detail');
+    }else{
+      setStatus('');
+      document.getElementById('detail-back').onclick=()=>showView('search');
+      renderDetail(t,row);
+    }
+  }catch(e){
+    setStatus('');
+    document.getElementById('detail-content').innerHTML=`<div class="err-box">⚠️ Could not load data. ${e.message}</div>`;
+    document.getElementById('detail-back').onclick=()=>showView('search');
+    showView('detail');
+  }
+}
+function findRow(t,q){return t.rows.slice(RS).find(r=>{const rv=r.c[C.roll];if(!rv)return false;const f=String(rv.v).trim().toUpperCase();return f===q||f.endsWith(q);})||null;}
+function setStatus(h){document.getElementById('status-msg').innerHTML=h;}
+document.getElementById('rollInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchStudent();});
+
+/* ── COHORT POSITIONS ── */
+function getPositions(roll){
+  if(!allStudents.length)return null;
+  const n=allStudents.length;
+  const byPts=[...allStudents].sort((a,b)=>b.pts-a.pts);
+  const byBdg=[...allStudents].sort((a,b)=>b.bdg-a.bdg);
+  const byAtt=[...allStudents].sort((a,b)=>parseFloat(b.att)-parseFloat(a.att));
+  const ptsPos=byPts.findIndex(s=>s.roll===roll)+1;
+  const bdgPos=byBdg.findIndex(s=>s.roll===roll)+1;
+  const attPos=byAtt.findIndex(s=>s.roll===roll)+1;
+  return{ptsPos,bdgPos,attPos,n};
+}
+function posBadge(pos,n){
+  const pct=pos/n;
+  if(pct<=.1)return'pos-top10';
+  if(pct<=.25)return'pos-top25';
+  return'pos-avg';
+}
+function posLabel(pos,n){
+  const pct=pos/n;
+  if(pct<=.1)return'Top 10%';
+  if(pct<=.25)return'Top 25%';
+  return'';
+}
+
+/* ── ATTENDANCE ── */
+function isMerged(v){return v&&/^(sunday|holiday)$/i.test(String(v).trim());}
+function buildAtt(t,row){
+  const maxCol=t.rows[RH].c.length;
+  const dr=t.rows[RD],hr=t.rows[RH],ss=[];
+  let i=C.attStart,lastDate='';
+  while(i<maxCol){
+    /* carry last known date forward — date row only populates FN column */
+    const rawDv=gv(dr,i);
+    if(rawDv)lastDate=rawDv;
+    const dv=lastDate;
+    if(!dv){i++;continue;}          // no date resolved yet, skip column
+    const lb=gv(hr,i), v=gv(row,i);
+    /* Sunday / Holiday: single-column entry in the sheet → advance by 1 */
+    if(isMerged(v)||isMerged(lb)){
+      const label=isMerged(v)?String(v).trim():String(lb).trim();
+      ss.push({date:dv,session:'merged',value:label});
+      i++;
+    } else {
+      /* Normal day: Forenoon (col i) + Afternoon (col i+1) */
+      ss.push({date:dv,session:lb||'Forenoon',value:v||null});
+      i++;
+      if(i<maxCol){
+        const v2=gv(row,i),l2=gv(hr,i);
+        ss.push({date:dv,session:l2||'Afternoon',value:v2||null});
+        i++;
+      }
+    }
+  }
+  return ss;
+}
+const dotH=v=>!v?`<span class="dot dn">–</span>`:v==='Present'?`<span class="dot dp">P</span>`:v==='Absent'?`<span class="dot da">A</span>`:v==='Sunday'?`<span class="dot ds">S</span>`:v==='Holiday'?`<span class="dot dh">H</span>`:`<span class="dot dn">${v[0]}</span>`;
+const tagsH=(str,cls)=>!str?'<em style="color:#ccc;font-size:.78rem">None</em>':str.split(/[;,]+/).map(s=>s.trim()).filter(Boolean).map(t=>`<span class="tg ${cls}">${t}</span>`).join('');
+
+/* ── RENDER DETAIL ── */
+function renderDetail(t,row){
+  const v=i=>gv(row,i);
+  const name=(v(C.name)||'').trim(),roll=String(v(C.roll)||'').trim();
+  const email=v(C.email)||'',phone=v(C.phone)?String(v(C.phone)):'';
+  const pay=v(C.pay)||'',sf=v(C.sf),cert=v(C.cert),course=v(C.course)||'',thUrl=v(C.thUrl)||'';
+  const rank=v(C.rank)||'',pts=v(C.pts),bdg=v(C.bdg),stm=v(C.stm);
+  const bdgList=v(C.bdgList)||'',stmList=v(C.stmList)||'',tbId=v(C.tbId)||'',err=v(C.err)||'';
+  const paid=pay.toLowerCase().includes('paid')&&!pay.toLowerCase().includes('not');
+
+  /* Cohort positions */
+  const pos=getPositions(roll);
+  const posHtml=pos?`
+    <div class="d-positions">
+      <div class="pos-card">
+        <div class="pos-num">#${pos.ptsPos}</div>
+        <div class="pos-of">of ${pos.n}</div>
+        <div class="pos-lbl">⚡ Points Rank</div>
+        ${posLabel(pos.ptsPos,pos.n)?`<div class="pos-badge ${posBadge(pos.ptsPos,pos.n)}">${posLabel(pos.ptsPos,pos.n)}</div>`:''}
+      </div>
+      <div class="pos-card">
+        <div class="pos-num">#${pos.bdgPos}</div>
+        <div class="pos-of">of ${pos.n}</div>
+        <div class="pos-lbl">🏅 Badges Rank</div>
+        ${posLabel(pos.bdgPos,pos.n)?`<div class="pos-badge ${posBadge(pos.bdgPos,pos.n)}">${posLabel(pos.bdgPos,pos.n)}</div>`:''}
+      </div>
+      <div class="pos-card">
+        <div class="pos-num">#${pos.attPos}</div>
+        <div class="pos-of">of ${pos.n}</div>
+        <div class="pos-lbl">📅 Attendance Rank</div>
+        ${posLabel(pos.attPos,pos.n)?`<div class="pos-badge ${posBadge(pos.attPos,pos.n)}">${posLabel(pos.attPos,pos.n)}</div>`:''}
+      </div>
+    </div>`:'' ;
+
+  /* Attendance table — compute present/absent/% from raw session data */
+  const ss=buildAtt(t,row);
+  let pre=0,abs=0;
+  ss.forEach(s=>{if(s.value==='Present')pre++;else if(s.value==='Absent')abs++;});
+  const total=pre+abs;
+  const pctVal=total>0?((pre/total)*100).toFixed(1):null;
+  const byD={};
+  ss.forEach(s=>{
+    const d=s.date||'';
+    if(!d)return;
+    if(!byD[d])byD[d]={Forenoon:null,Afternoon:null,merged:null};
+    if(s.session==='merged')byD[d].merged=s.value;
+    else byD[d][s.session]=s.value;
+  });
+  const aRows=Object.entries(byD).map(([d,s])=>{
+    if(s.merged!==null){
+      const icon=s.merged==='Sunday'?'☀️':'🎌';
+      return`<tr class="att-merged"><td>${d}</td><td colspan="2" style="text-align:center;color:#94a3b8;font-weight:600;letter-spacing:.04em">${icon} ${s.merged}</td></tr>`;
+    }
+    return`<tr><td>${d}</td><td>${dotH(s.Forenoon)}</td><td>${dotH(s.Afternoon)}</td></tr>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML=`
+
+    <!-- HERO -->
+    <div class="d-hero">
+      <div class="d-hero-top">
+        <div class="d-av">${(name[0]||'?').toUpperCase()}</div>
+        <div class="d-inf">
+          <div class="d-nm">${name}</div>
+          <div class="d-rl">Roll No: ${roll}</div>
+          <div class="d-tags">
+            ${paid?`<span class="dtag dt-paid">✔ Paid</span>`:`<span class="dtag dt-unpaid">✘ ${pay||'Not Paid'}</span>`}
+            ${sf==='Yes'?`<span class="dtag dt-sf">☁ SF Registered</span>`:''}
+            ${cert==='Yes'?`<span class="dtag dt-cert">🏅 Certified</span>`:`<span class="dtag dt-nc">📋 Not Certified</span>`}
+          </div>
+        </div>
+        ${rank?`<div class="d-rank-blk">
+          <div class="d-re">${ri(rank)}</div>
+          <div class="d-rn">${rank}</div>
+          ${pts!=null?`<div class="d-pts-lbl">⚡ ${Number(pts).toLocaleString()} pts</div>`:''}
+        </div>`:''}
+      </div>
+      ${posHtml}
+    </div>
+
+    <!-- 4 STAT BOXES -->
+    <div class="dstats">
+      <div class="dstat"><div class="dstat-n gold">${pts!=null?Number(pts).toLocaleString():'—'}</div><div class="dstat-l">⚡ Points</div></div>
+      <div class="dstat"><div class="dstat-n">${pctVal!=null?pctVal+'%':'—'}</div><div class="dstat-l">📅 Attendance</div></div>
+      <div class="dstat"><div class="dstat-n">${bdg??'—'}</div><div class="dstat-l">🏅 Badges</div></div>
+    </div>
+
+    <!-- INFO GRID — 3 columns -->
+    <div class="ig">
+
+      <div class="ic">
+        <div class="ic-t">📇 Contact</div>
+        <div class="ic-r"><div class="ic-l">Email</div><div class="ic-v"><a href="mailto:${email}">${email||'—'}</a></div></div>
+        ${err?`<div style="background:#fff5f5;border-left:3px solid #ef4444;border-radius:6px;padding:8px 10px;margin-top:8px;font-size:.75rem;color:#b91c1c">⚠️ ${err}</div>`:''}
+      </div>
+
+      <div class="ic">
+        <div class="ic-t">☁ Salesforce</div>
+        <div class="ic-r"><div class="ic-l">Rank</div><div class="ic-v">${rank||'—'}</div></div>
+        <div class="ic-r"><div class="ic-l">Points</div><div class="ic-v" style="color:#d97706;font-weight:700">⚡ ${pts!=null?Number(pts).toLocaleString():'—'}</div></div>
+        <div class="ic-r"><div class="ic-l">Trailhead</div><div class="ic-v">${thUrl?`<a href="${thUrl}" target="_blank" rel="noopener">Open Profile ↗</a>`:'—'}</div></div>
+      </div>
+
+      <div class="ic">
+        <div class="ic-t">📚 Course & Cert</div>
+        <div class="ic-r"><div class="ic-l">Course(s)</div><div class="ic-v">${course||'—'}</div></div>
+        <div class="ic-r"><div class="ic-l">Certified (Dec)</div><div class="ic-v" style="font-weight:700;color:${cert==='Yes'?'#059669':'#dc2626'}">${cert||'—'}</div></div>
+        <div class="ic-r"><div class="ic-l">SF Registered</div><div class="ic-v" style="font-weight:700;color:${sf==='Yes'?'#059669':'#dc2626'}">${sf||'—'}</div></div>
+      </div>
+
+      <div class="ic full">
+        <div class="ic-t">🏅 Earned Badges <span style="font-weight:500;color:#9ca3af;font-size:.75rem;text-transform:none;letter-spacing:0">(${bdg||0} total)</span></div>
+        <div class="tw">${tagsH(bdgList,'')}</div>
+      </div>
+
+      <div class="ic full">
+        <div class="ic-t">📅 Session Attendance</div>
+        <div class="att-sum">
+          ${pre!=null?`<span class="ap app">✔ Present: ${pre}</span>`:''}
+          ${abs!=null?`<span class="ap apa">✘ Absent: ${abs}</span>`:''}
+          ${pctVal!=null?`<span class="ap ap-pct">📊 ${pctVal}%</span>`:''}
+        </div>
+        <div class="att-tw"><table class="att-t">
+          <thead><tr><th>Date</th><th>Forenoon</th><th>Afternoon</th></tr></thead>
+          <tbody>${aRows||'<tr><td colspan="3" style="text-align:center;color:#ccc;padding:18px">No attendance data</td></tr>'}</tbody>
+        </table></div>
+        <div class="leg" style="margin-top:10px">
+          <span><span class="dot dp" style="width:18px;height:18px;font-size:.58rem">P</span>Present</span>
+          <span><span class="dot da" style="width:18px;height:18px;font-size:.58rem">A</span>Absent</span>
+          <span><span class="dot ds" style="width:18px;height:18px;font-size:.58rem">S</span>Sunday</span>
+          <span><span class="dot dh" style="width:18px;height:18px;font-size:.58rem">H</span>Holiday</span>
+          <span><span class="dot dn" style="width:18px;height:18px;font-size:.58rem">–</span>No data</span>
+        </div>
+      </div>
+
+    </div>`;
+
+  showView('detail');
+}
+
+/* ── INIT ── */
+loadDash();
+</script>
+</body>
+</html>
