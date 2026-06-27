@@ -851,8 +851,14 @@ function posLabel(pos,n){
 /* ── ATTENDANCE ── */
 function isMerged(v){return v&&/^(sunday|holiday)$/i.test(String(v).trim());}
 function buildAtt(t,row){
-  const maxCol=t.rows[RH].c.length;
   const dr=t.rows[RD],hr=t.rows[RH],ss=[];
+  /* bound to the LAST LABELLED attendance column. Using the full table
+     width pulls in trailing empty columns, which carry the last date
+     forward and overwrite the newest day's Present/Absent with null. */
+  let maxCol=C.attStart;
+  for(let j=hr.c.length-1;j>=C.attStart;j--){
+    if(hr.c[j]&&hr.c[j].v!=null&&String(hr.c[j].v).trim()!==''){maxCol=j+1;break;}
+  }
   let i=C.attStart,lastDate='';
   while(i<maxCol){
     /* carry last known date forward — date row only populates FN column */
