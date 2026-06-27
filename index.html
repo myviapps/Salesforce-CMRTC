@@ -513,18 +513,33 @@ function buildC(t){
 const RANKS={Trailblazer:'🌟',Explorer:'🔭',Hiker:'🥾',Mountaineer:'⛰️',Expeditioner:'🧭',Ranger:'🏕️','Double Star Ranger':'⭐','Triple Star Ranger':'🌠',Adventurer:'🏔️',Pioneer:'🚀',Pathfinder:'🛤️',Scout:'🔍',Master:'👑'};
 const ri=r=>{if(!r)return'🌟';for(const[k,v]of Object.entries(RANKS))if(r.toLowerCase().includes(k.toLowerCase()))return v;return'🌟';};
 
-/* ── FETCH ── */
+/* ── FETCH ──
+   Google now strips the custom "responseHandler" param from gviz URLs and
+   always replies via its DEFAULT handler google.visualization.Query.setResponse().
+   So we register that handler (plus a named fallback) instead of relying on a
+   custom callback name — otherwise the callback never fires and we falsely
+   time out as if the sheet were private. */
 let cache=null;
 function fetchSheet(){
   if(cache)return Promise.resolve(cache);
   return new Promise((res,rej)=>{
-    const cb='__g'+Date.now();
-    const t=setTimeout(()=>{cl();rej(new Error('Timed out. Share sheet as "Anyone with link can view".'))},14000);
-    function cl(){clearTimeout(t);delete window[cb];document.getElementById('__gs')?.remove();}
-    window[cb]=r=>{cl();r.status==='error'?rej(new Error(r.errors?.[0]?.message||'Sheet error')):(cache=r.table,res(r.table));};
+    let done=false;
+    function finish(fn){if(done)return;done=true;clearTimeout(t);document.getElementById('__gs')?.remove();fn();}
+    function handle(r){
+      if(!r||r.status==='error') finish(()=>rej(new Error((r&&r.errors&&r.errors[0]&&r.errors[0].message)||'Sheet error — check the tab name "'+SHEET_NAME+'".')));
+      else finish(()=>{cache=r.table;res(r.table);});
+    }
+    const t=setTimeout(()=>finish(()=>rej(new Error('Timed out reaching Google Sheets. Check your connection or that the sheet is shared as "Anyone with the link can view".'))),30000);
+    /* default gviz handler (what Google actually calls) */
+    window.google=window.google||{};
+    window.google.visualization=window.google.visualization||{};
+    window.google.visualization.Query=window.google.visualization.Query||{};
+    window.google.visualization.Query.setResponse=handle;
+    /* named fallback, in case responseHandler is honoured */
+    const cb='__g'+Date.now();window[cb]=handle;
     const s=document.createElement('script');s.id='__gs';
-    s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}&sheet=${encodeURIComponent(SHEET_NAME)}`;
-    s.onerror=()=>{cl();rej(new Error('Could not reach Google Sheets.'));};
+    s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json;responseHandler:${cb}`;
+    s.onerror=()=>finish(()=>rej(new Error('Could not reach Google Sheets.')));
     document.body.appendChild(s);
   });
 }
