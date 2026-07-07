@@ -867,37 +867,56 @@ function posLabel(pos,n){
 
 /* ── ATTENDANCE ── */
 function isMerged(v){return v&&/^(sunday|holiday)$/i.test(String(v).trim());}
+/* Normalise a gviz date-cell to DD-MM-YYYY. Text cells arrive as
+   "05-07-2026"; an unformatted cell arrives as a serial number (e.g. 46149)
+   or a "Date(y,m,d)" string — convert those so they never render as raw numbers. */
+function fmtDate(v){
+  if(v==null)return'';
+  if(typeof v==='number'){
+    const d=new Date(Date.UTC(1899,11,30)+v*86400000),p=n=>String(n).padStart(2,'0');
+    return `${p(d.getUTCDate())}-${p(d.getUTCMonth()+1)}-${d.getUTCFullYear()}`;
+  }
+  const m=/^Date\((\d+),(\d+),(\d+)/.exec(String(v));
+  if(m){const p=n=>String(n).padStart(2,'0');return `${p(+m[3])}-${p(+m[2]+1)}-${m[1]}`;}
+  return String(v).trim();
+}
 function buildAtt(t,row){
   const dr=t.rows[RD],hr=t.rows[RH],ss=[];
-  /* bound to the LAST LABELLED attendance column. Using the full table
-     width pulls in trailing empty columns, which carry the last date
-     forward and overwrite the newest day's Present/Absent with null. */
+  /* bound to the LAST LABELLED attendance column so trailing empty columns
+     don't carry the last date forward and null out the newest day. */
   let maxCol=C.attStart;
   for(let j=hr.c.length-1;j>=C.attStart;j--){
     if(hr.c[j]&&hr.c[j].v!=null&&String(hr.c[j].v).trim()!==''){maxCol=j+1;break;}
   }
+  /* LABEL-DRIVEN parse: a "Forenoon" opens a day and pairs with the next
+     "Afternoon"; "Sunday"/"Holiday" (or any lone label) is a single merged
+     day; an UNLABELLED column is skipped — otherwise a stray/placeholder
+     column (e.g. an unlabelled Sunday) knocks every later day's
+     Forenoon/Afternoon pairing out of alignment. */
   let i=C.attStart,lastDate='';
   while(i<maxCol){
-    /* carry last known date forward — date row only populates FN column */
     const rawDv=gv(dr,i);
-    if(rawDv)lastDate=rawDv;
+    if(rawDv!=null&&String(rawDv).trim()!=='')lastDate=fmtDate(rawDv);
+    const lb=gv(hr,i), lbl=lb!=null?String(lb).trim():'';
+    const v=gv(row,i);
+    if(!lbl){i++;continue;}                       // unlabelled → skip
     const dv=lastDate;
-    if(!dv){i++;continue;}          // no date resolved yet, skip column
-    const lb=gv(hr,i), v=gv(row,i);
-    /* Sunday / Holiday: single-column entry in the sheet → advance by 1 */
-    if(isMerged(v)||isMerged(lb)){
-      const label=isMerged(v)?String(v).trim():String(lb).trim();
-      ss.push({date:dv,session:'merged',value:label});
+    if(isMerged(v)||isMerged(lbl)){
+      ss.push({date:dv,session:'merged',value:isMerged(v)?String(v).trim():lbl});
       i++;
-    } else {
-      /* Normal day: Forenoon (col i) + Afternoon (col i+1) */
-      ss.push({date:dv,session:lb||'Forenoon',value:v||null});
+    } else if(/forenoon/i.test(lbl)){
+      ss.push({date:dv,session:'Forenoon',value:v||null});
       i++;
       if(i<maxCol){
-        const v2=gv(row,i),l2=gv(hr,i);
-        ss.push({date:dv,session:l2||'Afternoon',value:v2||null});
-        i++;
+        const l2=gv(hr,i), l2s=l2!=null?String(l2).trim():'';
+        if(/afternoon/i.test(l2s)){ss.push({date:dv,session:'Afternoon',value:gv(row,i)||null});i++;}
       }
+    } else if(/afternoon/i.test(lbl)){
+      ss.push({date:dv,session:'Afternoon',value:v||null});
+      i++;
+    } else {
+      ss.push({date:dv,session:'merged',value:lbl});   // any other lone label
+      i++;
     }
   }
   return ss;
