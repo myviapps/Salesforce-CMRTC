@@ -537,8 +537,10 @@ function fetchSheet(){
     window.google.visualization.Query.setResponse=handle;
     /* named fallback, in case responseHandler is honoured */
     const cb='__g'+Date.now();window[cb]=handle;
+    /* &cb=<timestamp> busts Google's gviz cache — without a unique param it
+       keeps returning an old snapshot, so newly added columns never appear. */
     const s=document.createElement('script');s.id='__gs';
-    s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json;responseHandler:${cb}`;
+    s.src=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&tqx=out:json;responseHandler:${cb}&cb=${Date.now()}`;
     s.onerror=()=>finish(()=>rej(new Error('Could not reach Google Sheets.')));
     document.body.appendChild(s);
   });
